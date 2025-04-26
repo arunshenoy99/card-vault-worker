@@ -292,8 +292,10 @@
 			const nameValue = document.getElementById('name').value;
 			const generatedId = nameValue.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '').slice(0, 50);
 
+			const idToUse = isEditing ? editingId : generatedId;
+
 			const data = {
-				id: isEditing ? editingId : generatedId,
+				id: idToUse,
 				name: nameValue,
 				issuer: document.getElementById('issuer').value,
 				annual_fee: document.getElementById('annual_fee').value,
@@ -309,6 +311,10 @@
 				},
 				notes: document.getElementById('notes').value
 			};
+
+			if (isEditing) {
+				await fetch(`/card/${editingId}`, { method: 'DELETE' });
+			}
 
 			await fetch('/card', {
 				method: 'POST',
