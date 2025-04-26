@@ -1,0 +1,20 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "card-vault-worker",
+	"main": "src/index.js",
+	"compatibility_date": "2025-04-26",
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./public"
+	},
+	"kv_namespaces": [
+		{
+			"binding": "CARDS",
+			"id": "local",
+			"preview_id": "local"
+		}
+	],
+	"observability": {
+		"enabled": true
+	}
+}
