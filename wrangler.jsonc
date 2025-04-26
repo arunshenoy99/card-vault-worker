@@ -3,15 +3,14 @@
 	"name": "card-vault-worker",
 	"main": "src/index.js",
 	"compatibility_date": "2025-04-26",
-	"assets": {
-		"binding": "ASSETS",
-		"directory": "./public"
+	"site": {
+		"bucket": "./public"
 	},
 	"kv_namespaces": [
 		{
 			"binding": "CARDS",
-			"id": "local",
-			"preview_id": "local"
+			"id": "fb039f8157ad4f688f46123bee0bbd2b",
+			"preview_id": "fb039f8157ad4f688f46123bee0bbd2b"
 		}
 	],
 	"observability": {
