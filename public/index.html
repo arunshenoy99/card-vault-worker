@@ -3,6 +3,7 @@
 
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Card Vault</title>
 	<style>
 		body {
@@ -248,36 +249,41 @@
 		function displayCards() {
 			const list = document.getElementById('cardsList');
 			list.innerHTML = '';
+			const fragment = document.createDocumentFragment();
+
 			for (const id in allCards) {
 				const card = allCards[id];
 				const div = document.createElement('div');
 				div.className = 'card-item';
 				div.innerHTML = `
-          <div class="card-header" onclick="toggleCard('${id}')">
-            <div>
-              <h3>${card.name}</h3>
-              <small>${card.issuer}</small>
+            <div class="card-header" onclick="toggleCard('${id}')">
+                <div>
+                    <h3>${card.name}</h3>
+                    <small>${card.issuer}</small>
+                </div>
+                <div class="chevron down" id="chevron-${id}">⌄</div>
             </div>
-            <div class="chevron down" id="chevron-${id}">⌄</div>
-          </div>
-          <div class="card-extra" id="card-extra-${id}">
-            <p><strong>Annual Fee:</strong> ${card.annual_fee}</p>
-            <p><strong>Domestic Lounges:</strong> ${card.lounges.domestic}</p>
-            <p><strong>International Lounges:</strong> ${card.lounges.international}</p>
-            <p><strong>FCY Markup:</strong> ${card.fcy_markup}</p>
-            <p><strong>Petrol Surcharge:</strong> ${card.petrol_surcharge}</p>
-            <p><strong>Other Benefits:</strong><br> ${card.other_benefits.map(b => `• ${b}`).join('<br>')}</p>
-            <p><strong>Renewal Date:</strong> ${card.important_dates.renewal_date}</p>
-            <p><strong>Notes:</strong><br> ${card.notes.replace(/\n/g, '<br>')}</p>
-            <div class="card-buttons">
-              <button onclick="editCard('${id}'); event.stopPropagation();">Edit</button>
-              <button class="delete" onclick="deleteCard('${id}'); event.stopPropagation();">Delete</button>
+            <div class="card-extra" id="card-extra-${id}">
+                <p><strong>Annual Fee:</strong> ${card.annual_fee}</p>
+                <p><strong>Domestic Lounges:</strong> ${card.lounges.domestic}</p>
+                <p><strong>International Lounges:</strong> ${card.lounges.international}</p>
+                <p><strong>FCY Markup:</strong> ${card.fcy_markup}</p>
+                <p><strong>Petrol Surcharge:</strong> ${card.petrol_surcharge}</p>
+                <p><strong>Other Benefits:</strong><br> ${card.other_benefits.map(b => `• ${b}`).join('<br>')}</p>
+                <p><strong>Renewal Date:</strong> ${card.important_dates.renewal_date}</p>
+                <p><strong>Notes:</strong><br> ${card.notes.replace(/\n/g, '<br>')}</p>
+                <div class="card-buttons">
+                    <button onclick="editCard('${id}'); event.stopPropagation();">Edit</button>
+                    <button class="delete" onclick="deleteCard('${id}'); event.stopPropagation();">Delete</button>
+                </div>
             </div>
-          </div>
         `;
-				list.appendChild(div);
+				fragment.appendChild(div);
 			}
+
+			list.appendChild(fragment);
 		}
+
 
 		function toggleCard(id) {
 			const extraDiv = document.getElementById(`card-extra-${id}`);
@@ -305,17 +311,27 @@
 			const card = allCards[id];
 			showForm(true);
 			editingId = id;
-			document.getElementById('name').value = card.name;
-			document.getElementById('issuer').value = card.issuer;
-			document.getElementById('annual_fee').value = card.annual_fee;
-			document.getElementById('domestic').value = card.lounges.domestic;
-			document.getElementById('international').value = card.lounges.international;
-			document.getElementById('fcy_markup').value = card.fcy_markup;
-			document.getElementById('petrol_surcharge').value = card.petrol_surcharge;
-			document.getElementById('other_benefits').value = card.other_benefits.join(', ');
-			document.getElementById('renewal_date').value = card.important_dates.renewal_date;
-			document.getElementById('notes').value = card.notes;
+
+			const fieldMappings = {
+				name: card.name,
+				issuer: card.issuer,
+				annual_fee: card.annual_fee,
+				domestic: card.lounges.domestic,
+				international: card.lounges.international,
+				fcy_markup: card.fcy_markup,
+				petrol_surcharge: card.petrol_surcharge,
+				other_benefits: card.other_benefits.join(', '),
+				renewal_date: card.important_dates.renewal_date,
+				notes: card.notes
+			};
+
+			for (const [id, value] of Object.entries(fieldMappings)) {
+				document.getElementById(id).value = value;
+			}
+
+			document.getElementById('cardForm').scrollIntoView({ behavior: 'smooth' });
 		}
+
 
 		function showForm(edit = false) {
 			isEditing = edit;
@@ -331,28 +347,40 @@
 
 		document.getElementById('cardForm').addEventListener('submit', async (e) => {
 			e.preventDefault();
+			const formElements = {
+				name: document.getElementById('name'),
+				issuer: document.getElementById('issuer'),
+				annual_fee: document.getElementById('annual_fee'),
+				domestic: document.getElementById('domestic'),
+				international: document.getElementById('international'),
+				fcy_markup: document.getElementById('fcy_markup'),
+				petrol_surcharge: document.getElementById('petrol_surcharge'),
+				other_benefits: document.getElementById('other_benefits'),
+				renewal_date: document.getElementById('renewal_date'),
+				notes: document.getElementById('notes')
+			};
 
-			const nameValue = document.getElementById('name').value;
+
+			const nameValue = formElements.name.value;
 			const generatedId = nameValue.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '').slice(0, 50);
-
 			const idToUse = isEditing ? editingId : generatedId;
 
 			const data = {
 				id: idToUse,
 				name: nameValue,
-				issuer: document.getElementById('issuer').value,
-				annual_fee: document.getElementById('annual_fee').value,
+				issuer: formElements.issuer.value,
+				annual_fee: formElements.annual_fee.value,
 				lounges: {
-					domestic: document.getElementById('domestic').value,
-					international: document.getElementById('international').value,
+					domestic: formElements.domestic.value,
+					international: formElements.international.value,
 				},
-				fcy_markup: document.getElementById('fcy_markup').value,
-				petrol_surcharge: document.getElementById('petrol_surcharge').value,
-				other_benefits: document.getElementById('other_benefits').value.split(',').map(x => x.trim()),
+				fcy_markup: formElements.fcy_markup.value,
+				petrol_surcharge: formElements.petrol_surcharge.value,
+				other_benefits: formElements.other_benefits.value.split(',').map(x => x.trim()),
 				important_dates: {
-					renewal_date: document.getElementById('renewal_date').value,
+					renewal_date: formElements.renewal_date.value,
 				},
-				notes: document.getElementById('notes').value
+				notes: formElements.notes.value
 			};
 
 			if (isEditing) {
