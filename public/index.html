@@ -7,21 +7,76 @@
 	<title>Card Vault</title>
 	<style>
 		body {
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 			margin: 0;
-			padding: 2rem;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 			background-color: #f7f8fa;
 			color: #333;
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
 		}
 
-		h1 {
-			text-align: center;
-			color: #2b2b2b;
+		.sidebar {
+			width: 250px;
+			background: #ffffff;
+			border-right: 1px solid #ddd;
+			overflow-y: auto;
+			transition: transform 0.3s ease;
+			display: flex;
+			flex-direction: column;
 		}
 
-		.top-actions {
-			text-align: center;
-			margin: 1rem 0;
+		.sidebar-header {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 1rem;
+			background: #f0f0f0;
+			border-bottom: 1px solid #ccc;
+		}
+
+		.sidebar-header h2 {
+			margin: 0;
+			font-size: 1.2rem;
+		}
+
+		.card-names {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		.card-names li {
+			padding: 1rem;
+			border-bottom: 1px solid #eee;
+			cursor: pointer;
+		}
+
+		.card-names li.active {
+			background: #ddd;
+			font-weight: bold;
+		}
+
+		.main-content {
+			flex: 1;
+			padding: 1rem 2rem;
+			overflow-y: auto;
+			position: relative;
+		}
+
+		.top-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		.hamburger {
+			background: none;
+			border: none;
+			font-size: 1.8rem;
+			cursor: pointer;
+			display: none;
 		}
 
 		.top-actions button {
@@ -35,17 +90,16 @@
 		}
 
 		form {
-			display: none;
 			background: white;
 			padding: 2rem;
-			margin: 2rem auto;
+			margin: 2rem 0;
 			max-width: 700px;
 			border-radius: 10px;
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 			display: flex;
 			flex-direction: column;
 			gap: 1.2rem;
-			box-sizing: border-box;
+			display: none;
 		}
 
 		form input,
@@ -76,39 +130,12 @@
 			color: white;
 		}
 
-		.cards-list {
-			max-width: 700px;
-			margin: 2rem auto;
-			display: flex;
-			flex-direction: column;
-			gap: 1rem;
-		}
-
-		.card-item {
+		.card-detail {
 			background: white;
-			padding: 1.5rem;
+			padding: 2rem;
 			border-radius: 10px;
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-			display: flex;
-			flex-direction: column;
-			gap: 1rem;
-			position: relative;
-		}
-
-		.card-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			cursor: pointer;
-		}
-
-		.card-header h3 {
-			margin: 0;
-			font-size: 1.2rem;
-		}
-
-		.card-header small {
-			color: #777;
+			margin-top: 1rem;
 		}
 
 		.card-buttons {
@@ -130,177 +157,113 @@
 			color: white;
 		}
 
-		.card-extra {
-			overflow: hidden;
-			max-height: 0;
-			transition: all 0.4s ease;
-			display: flex;
-			flex-direction: column;
-			gap: 0.5rem;
-		}
-
-		.card-extra.open {
-			max-height: 300px;
-			overflow-y: auto;
-			margin-top: 1rem;
-			padding-right: 10px;
-		}
-
-
-		.chevron {
-			font-size: 1.5rem;
-			transition: transform 0.3s ease;
-		}
-
-		.chevron.down {
-			transform: rotate(0deg);
-		}
-
-		.chevron.up {
-			transform: rotate(180deg);
-		}
-
-		@media (max-width: 600px) {
-			body {
-				padding: 1rem;
+		@media (max-width: 768px) {
+			.sidebar {
+				position: absolute;
+				height: 100%;
+				transform: translateX(-100%);
+				z-index: 1000;
 			}
 
-			.cards-list {
-				max-width: 95%;
-				margin: 1rem auto;
+			.sidebar.open {
+				transform: translateX(0);
 			}
 
-			.card-item {
-				padding: 1rem;
-				gap: 0.8rem;
-			}
-
-			.card-header h3 {
-				font-size: 1rem;
-			}
-
-			.card-buttons {
-				flex-direction: column;
-				align-items: stretch;
-			}
-
-			.card-buttons button {
-				width: 100%;
-				font-size: 1rem;
-				padding: 0.7rem 1rem;
-			}
-
-			input,
-			textarea {
-				padding: 0.7rem 0.9rem;
-				font-size: 0.95rem;
-			}
-
-			.top-actions button {
-				width: 100%;
-				font-size: 1rem;
-				padding: 0.8rem 1rem;
+			.hamburger {
+				display: inline;
 			}
 		}
 	</style>
 </head>
 
 <body>
-
-	<h1>Card Vault</h1>
-
-	<div class="top-actions">
-		<button onclick="showForm(false)">Add Card</button>
-	</div>
-
-	<form id="cardForm" style="display: none;">
-		<input type="text" id="name" placeholder="Card Name" required>
-		<input type="text" id="issuer" placeholder="Issuer">
-		<input type="text" id="annual_fee" placeholder="Annual Fee">
-		<input type="text" id="domestic" placeholder="Domestic Lounges">
-		<input type="text" id="international" placeholder="International Lounges">
-		<input type="text" id="fcy_markup" placeholder="FCY Markup %">
-		<input type="text" id="petrol_surcharge" placeholder="Petrol Surcharge Waiver">
-		<textarea id="other_benefits" placeholder="Other Benefits (comma separated)"></textarea>
-		<input type="date" id="renewal_date">
-		<textarea id="notes" placeholder="Notes"></textarea>
-		<div style="display: flex; gap: 1rem;">
-			<button type="submit">Save Card</button>
-			<button type="button" onclick="hideForm()">Cancel</button>
+	<aside class="sidebar" id="sidebar">
+		<div class="sidebar-header">
+			<h2>Cards</h2>
 		</div>
-	</form>
-
-	<div class="cards-list" id="cardsList">Loading cards...</div>
-
+		<ul class="card-names" id="cardList"></ul>
+	</aside>
+	<div class="main-content">
+		<div class="top-header">
+			<button class="hamburger" onclick="toggleSidebar()">☰</button>
+			<div class="top-actions">
+				<button onclick="showForm(false)">Add Card</button>
+			</div>
+		</div>
+		<form id="cardForm">
+			<input type="text" id="name" placeholder="Card Name" required>
+			<input type="text" id="issuer" placeholder="Issuer">
+			<input type="text" id="annual_fee" placeholder="Annual Fee">
+			<input type="text" id="domestic" placeholder="Domestic Lounges">
+			<input type="text" id="international" placeholder="International Lounges">
+			<input type="text" id="fcy_markup" placeholder="FCY Markup %">
+			<input type="text" id="petrol_surcharge" placeholder="Petrol Surcharge Waiver">
+			<textarea id="other_benefits" placeholder="Other Benefits (comma separated)"></textarea>
+			<input type="date" id="renewal_date">
+			<textarea id="notes" placeholder="Notes"></textarea>
+			<div style="display: flex; gap: 1rem;">
+				<button type="submit">Save Card</button>
+				<button type="button" onclick="hideForm()">Cancel</button>
+			</div>
+		</form>
+		<div id="cardContent" class="card-detail">
+			Select a card from the left to view details.
+		</div>
+	</div>
 	<script>
 		let allCards = {};
 		let isEditing = false;
 		let editingId = null;
 
+		function toggleSidebar() {
+			document.getElementById('sidebar').classList.toggle('open');
+		}
+
 		async function fetchCards() {
-			const list = document.getElementById('cardsList');
-			list.innerHTML = 'Loading cards...';
 			try {
 				const res = await fetch('/cards');
 				allCards = await res.json();
-				displayCards();
+				displayCardNames();
 			} catch (err) {
-				list.innerHTML = 'Error loading cards. Try again.';
+				document.getElementById('cardContent').innerText = 'Error loading cards.';
 			}
 		}
 
-		function displayCards() {
-			const list = document.getElementById('cardsList');
+		function displayCardNames() {
+			const list = document.getElementById('cardList');
 			list.innerHTML = '';
-			const fragment = document.createDocumentFragment();
-
 			for (const id in allCards) {
-				const card = allCards[id];
-				const div = document.createElement('div');
-				div.className = 'card-item';
-				div.innerHTML = `
-            <div class="card-header" onclick="toggleCard('${id}')">
-                <div>
-                    <h3>${card.name}</h3>
-                    <small>${card.issuer}</small>
-                </div>
-                <div class="chevron down" id="chevron-${id}">⌄</div>
-            </div>
-            <div class="card-extra" id="card-extra-${id}">
-                <p><strong>Annual Fee:</strong> ${card.annual_fee}</p>
-                <p><strong>Domestic Lounges:</strong> ${card.lounges.domestic}</p>
-                <p><strong>International Lounges:</strong> ${card.lounges.international}</p>
-                <p><strong>FCY Markup:</strong> ${card.fcy_markup}</p>
-                <p><strong>Petrol Surcharge:</strong> ${card.petrol_surcharge}</p>
-                <p><strong>Other Benefits:</strong><br> ${card.other_benefits.map(b => `• ${b}`).join('<br>')}</p>
-                <p><strong>Renewal Date:</strong> ${card.important_dates.renewal_date}</p>
-                <p><strong>Notes:</strong><br> ${card.notes.replace(/\n/g, '<br>')}</p>
-                <div class="card-buttons">
-                    <button onclick="editCard('${id}'); event.stopPropagation();">Edit</button>
-                    <button class="delete" onclick="deleteCard('${id}'); event.stopPropagation();">Delete</button>
-                </div>
-            </div>
-        `;
-				fragment.appendChild(div);
+				const li = document.createElement('li');
+				li.id = `card-${id}`;
+				li.textContent = allCards[id].name;
+				li.onclick = () => {
+					selectCard(id);
+					if (window.innerWidth <= 768) toggleSidebar();
+				};
+				list.appendChild(li);
 			}
-
-			list.appendChild(fragment);
 		}
 
-
-		function toggleCard(id) {
-			const extraDiv = document.getElementById(`card-extra-${id}`);
-			const chevron = document.getElementById(`chevron-${id}`);
-			const isOpen = extraDiv.classList.contains('open');
-
-			document.querySelectorAll('.card-extra').forEach(div => div.classList.remove('open'));
-			document.querySelectorAll('.chevron').forEach(c => { c.classList.remove('up'); c.classList.add('down'); });
-
-			if (!isOpen) {
-				extraDiv.classList.add('open');
-				chevron.classList.remove('down');
-				chevron.classList.add('up');
-			}
+		function selectCard(id) {
+			document.querySelectorAll('#cardList li').forEach(li => li.classList.remove('active'));
+			document.getElementById(`card-${id}`).classList.add('active');
+			const card = allCards[id];
+			document.getElementById('cardContent').innerHTML = `
+        <h2>${card.name}</h2>
+        <p><strong>Issuer:</strong> ${card.issuer}</p>
+        <p><strong>Annual Fee:</strong> ${card.annual_fee}</p>
+        <p><strong>Domestic Lounges:</strong> ${card.lounges.domestic}</p>
+        <p><strong>International Lounges:</strong> ${card.lounges.international}</p>
+        <p><strong>FCY Markup:</strong> ${card.fcy_markup}</p>
+        <p><strong>Petrol Surcharge Waiver:</strong> ${card.petrol_surcharge}</p>
+        <p><strong>Other Benefits:</strong><br>${card.other_benefits.map(b => `• ${b}`).join('<br>')}</p>
+        <p><strong>Renewal Date:</strong> ${card.important_dates.renewal_date}</p>
+        <p><strong>Notes:</strong><br>${card.notes.replace(/\n/g, '<br>')}</p>
+        <div class="card-buttons">
+          <button onclick="editCard('${id}')">Edit</button>
+          <button class="delete" onclick="deleteCard('${id}')">Delete</button>
+        </div>
+      `;
 		}
 
 		async function deleteCard(id) {
@@ -308,14 +271,14 @@
 			await fetch(`/card/${id}`, { method: 'DELETE' });
 			alert('Card deleted successfully!');
 			fetchCards();
+			document.getElementById('cardContent').innerHTML = 'Select a card to view details.';
 		}
 
 		function editCard(id) {
 			const card = allCards[id];
 			showForm(true);
 			editingId = id;
-
-			const fieldMappings = {
+			const fields = {
 				name: card.name,
 				issuer: card.issuer,
 				annual_fee: card.annual_fee,
@@ -327,63 +290,84 @@
 				renewal_date: card.important_dates.renewal_date,
 				notes: card.notes
 			};
-
-			for (const [id, value] of Object.entries(fieldMappings)) {
-				document.getElementById(id).value = value;
+			for (const [key, value] of Object.entries(fields)) {
+				document.getElementById(key).value = value;
 			}
-
 			document.getElementById('cardForm').scrollIntoView({ behavior: 'smooth' });
 		}
-
 
 		function showForm(edit = false) {
 			isEditing = edit;
 			document.getElementById('cardForm').style.display = 'flex';
-			if (!edit) document.getElementById('cardForm').reset();
+			document.getElementById('cardContent').style.display = 'none';  // 👈 Hide the card view
+
+			if (!edit) {
+				document.getElementById('cardForm').reset();
+				const tempId = 'temp-' + Date.now();
+				editingId = tempId;
+
+				allCards[tempId] = {
+					name: "Untitled Card",
+					issuer: "",
+					annual_fee: "",
+					lounges: { domestic: "", international: "" },
+					fcy_markup: "",
+					petrol_surcharge: "",
+					other_benefits: [],
+					important_dates: { renewal_date: "" },
+					notes: ""
+				};
+
+				const li = document.createElement('li');
+				li.id = `card-${tempId}`;
+				li.classList.add('active');
+				li.textContent = "Untitled Card";
+				li.onclick = () => {
+					selectCard(tempId);
+					if (window.innerWidth <= 768) toggleSidebar();
+				};
+
+				document.querySelectorAll('#cardList li').forEach(li => li.classList.remove('active'));
+				document.getElementById('cardList').appendChild(li);
+			}
+
+			document.getElementById('name').focus();
 		}
 
 		function hideForm() {
+			if (editingId && editingId.startsWith('temp-')) {
+				delete allCards[editingId];
+				const tempLi = document.getElementById(`card-${editingId}`);
+				if (tempLi) tempLi.remove();
+			}
+
 			document.getElementById('cardForm').style.display = 'none';
+			document.getElementById('cardContent').style.display = 'block';  // 👈 Show the card view back
+
 			isEditing = false;
 			editingId = null;
 		}
 
 		document.getElementById('cardForm').addEventListener('submit', async (e) => {
 			e.preventDefault();
-			const formElements = {
-				name: document.getElementById('name'),
-				issuer: document.getElementById('issuer'),
-				annual_fee: document.getElementById('annual_fee'),
-				domestic: document.getElementById('domestic'),
-				international: document.getElementById('international'),
-				fcy_markup: document.getElementById('fcy_markup'),
-				petrol_surcharge: document.getElementById('petrol_surcharge'),
-				other_benefits: document.getElementById('other_benefits'),
-				renewal_date: document.getElementById('renewal_date'),
-				notes: document.getElementById('notes')
-			};
+			const fields = ['name', 'issuer', 'annual_fee', 'domestic', 'international', 'fcy_markup', 'petrol_surcharge', 'other_benefits', 'renewal_date', 'notes'];
+			const formData = {};
+			fields.forEach(id => formData[id] = document.getElementById(id).value);
 
-
-			const nameValue = formElements.name.value;
-			const generatedId = nameValue.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '').slice(0, 50);
+			const generatedId = formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '').slice(0, 50);
 			const idToUse = isEditing ? editingId : generatedId;
 
 			const data = {
 				id: idToUse,
-				name: nameValue,
-				issuer: formElements.issuer.value,
-				annual_fee: formElements.annual_fee.value,
-				lounges: {
-					domestic: formElements.domestic.value,
-					international: formElements.international.value,
-				},
-				fcy_markup: formElements.fcy_markup.value,
-				petrol_surcharge: formElements.petrol_surcharge.value,
-				other_benefits: formElements.other_benefits.value.split(',').map(x => x.trim()),
-				important_dates: {
-					renewal_date: formElements.renewal_date.value,
-				},
-				notes: formElements.notes.value
+				name: formData.name,
+				issuer: formData.issuer,
+				annual_fee: formData.annual_fee,
+				lounges: { domestic: formData.domestic, international: formData.international },
+				fcy_markup: formData.fcy_markup,
+				petrol_surcharge: formData.petrol_surcharge,
+				other_benefits: formData.other_benefits.split(',').map(x => x.trim()),
+				important_dates: { renewal_date: formData.renewal_date },
+				notes: formData.notes
 			};
 
 			if (isEditing) {
@@ -397,13 +381,20 @@
 			});
 
 			alert('Card saved successfully!');
-			fetchCards();
+			await fetchCards();
 			hideForm();
+			selectCard(idToUse);  // 👈 Focus on saved card
 		});
 
-		fetchCards();
-	</script>
 
+		fetchCards();
+
+		document.getElementById('name').addEventListener('input', (e) => {
+			if (editingId && document.getElementById(`card-${editingId}`)) {
+				document.getElementById(`card-${editingId}`).textContent = e.target.value || "Untitled Card";
+			}
+		});
+	</script>
 </body>
 
 </html>
